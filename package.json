@@ -1,0 +1,32 @@
+{
+  "name": "gsheets-db",
+  "version": "1.0.0",
+  "description": "Use Google Sheets as a database.",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon --exec babel-node index.js",
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zdettwiler/gsheets-db.git"
+  },
+  "author": "Zach Dettwiler",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zdettwiler/gsheets-db/issues"
+  },
+  "homepage": "https://github.com/zdettwiler/gsheets-db#readme",
+  "dependencies": {
+    "dotenv": "^8.0.0",
+    "google-auth-library": "^4.0.0",
+    "googleapis": "^39.2.0",
+    "lokijs": "^1.5.6"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.4.4",
+    "@babel/node": "^7.2.2",
+    "@babel/preset-env": "^7.4.4",
+    "nodemon": "^1.19.0"
+  }
+}
