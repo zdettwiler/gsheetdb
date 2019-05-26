@@ -17,7 +17,7 @@ const SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 const sheetsApi = google.sheets({ version: 'v4' })
 let db = new loki('test.json')
 
-class GSheetDB {
+export default class GSheetDB {
 
   constructor(spreadsheetId, range, nbHeaderRows=1) {
     this.spreadsheetId = spreadsheetId
