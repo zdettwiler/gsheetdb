@@ -67,14 +67,30 @@ export default class GSheetDB {
    */
   async save(requests) {
     // update spreadsheet
-    await sheetsApi.spreadsheets.values.batchUpdate({
-      auth: this.client,
-      spreadsheetId: this.spreadsheetId,
-      resource: {
+    try {
+      // await sheetsApi.spreadsheets.values.batchUpdate({
+      //   auth: this.client,
+      //   spreadsheetId: this.spreadsheetId,
+      //   resource: {
+      //     valueInputOption: 'RAW',
+      //     data: requests
+      //   }
+      // })
+
+      await sheetsApi.spreadsheets.values.append({
+        auth: this.client,
+        spreadsheetId: this.spreadsheetId,
+        range: 'gsheetdb!A1:F',
+        insertDataOption: 'INSERT_ROWS',
         valueInputOption: 'RAW',
-        data: requests
-      }
-    })
-    console.log('💾 Data saved.')
+        resource: {
+          range: 'gsheetdb!A1:F',
+          majorDimension: 'ROWS',
+          values: [ ['date', undefined, undefined, 987, 'test'] ]
+        }
+      })
+      console.log('💾 Data saved.')
+
+    } catch (e) { console.log(e) }
   }
 }

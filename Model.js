@@ -121,6 +121,13 @@ export default class Model {
     this.data.update(wordToUpdate)
   }
 
+  insertRow(insertObj) {
+    this.data.insert({
+      ...insertObj,
+      update: true
+    })
+  }
+
 }
 
 /*

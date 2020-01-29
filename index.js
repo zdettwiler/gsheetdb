@@ -6,7 +6,14 @@ async function operations() {
     { categ: 'Food' },
     { amount: 15 }
   )
+  testmodel.insertRow({
+    date: 'date',
+    amount: 987,
+    type: 'test'
+  })
+  console.log(testmodel.getData())
   await testmodel.save()
+  console.log(testmodel.getData())
 }
 
 operations()
