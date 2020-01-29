@@ -1,7 +1,12 @@
-import sheet from './db'
+import testmodel from './testmodel';
 
-sheet.connect().then((sheet) => {
-  // sheet.updateRow({ greek: 'ἀμην' }, { chapter: 1 })
-  // sheet.save()
-  console.log(sheet.where(word => word.revisionBox === 'every-day'))
-})
+async function operations() {
+  await testmodel.connect()
+  testmodel.updateRow(
+    { categ: 'Food' },
+    { amount: 15 }
+  )
+  await testmodel.save()
+}
+
+operations()
