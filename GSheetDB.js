@@ -16,8 +16,11 @@ const sheetsApi = google.sheets({ version: 'v4' })
 
 export default class GSheetDB {
 
-  constructor(spreadsheetId) {
-    this.spreadsheetId = spreadsheetId
+  constructor(params) {
+    // TO DO check params
+    console.log(params)
+    this.spreadsheetId = params.sheetId
+    this.headers = params.headers
     this.client = undefined
   }
 
@@ -27,16 +30,6 @@ export default class GSheetDB {
    *  - load data in Loki
    */
   async connect() {
-    await this.createClient()
-
-    console.log('🔌 Connection to database successful.')
-    return this
-  }
-
-  /**
-   * Create client
-   */
-  async createClient() {
     if (!this.client) {
       // if credentials.json does not exist, use environment var
       const credentials = process.env.GOOGLE_AUTH_CREDS
@@ -53,13 +46,21 @@ export default class GSheetDB {
   /**
    * Fetch data from provided range
    */
-  async fetchData(range) {
-    return sheetsApi.spreadsheets.values.get({
+  async getData(range) {
+    this.connect()
+
+    let dataRange = range
+      ? range
+      : process.env.GSHEET_RANGE
+
+    let data = sheetsApi.spreadsheets.values.get({
       auth: this.client,
       spreadsheetId: this.spreadsheetId,
-      range: range,
+      range: dataRange,
       valueRenderOption: 'UNFORMATTED_VALUE',
     })
+
+    return data
   }
 
   /**
