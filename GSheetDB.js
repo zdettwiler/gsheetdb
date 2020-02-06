@@ -21,7 +21,11 @@ export default class GSheetDB {
     console.log(params)
     this.spreadsheetId = params.sheetId
     this.headers = params.headers
+    this.headerRow = []
+    this.sheetName = params.sheetName
     this.client = undefined
+    this.data = []
+    // this.data = lokiDB.addCollection('data')
   }
 
   /**
@@ -30,7 +34,9 @@ export default class GSheetDB {
    *  - load data in Loki
    */
   async connect() {
-    if (!this.client) {
+    if (this.client) return
+    
+    try {
       // if credentials.json does not exist, use environment var
       const credentials = process.env.GOOGLE_AUTH_CREDS
         ? JSON.parse(process.env.GOOGLE_AUTH_CREDS)
@@ -40,58 +46,83 @@ export default class GSheetDB {
       this.client.scopes = SCOPES
       await this.client.authorize()
       console.log('✨ Created new client.')
-    }
+
+    } catch (e) { console.log('error getting client') }
   }
 
   /**
    * Fetch data from provided range
    */
-  async getData(range) {
-    this.connect()
+  async getData(dataRange = this.sheetName) {
+    try {
+      await this.connect()
 
-    let dataRange = range
-      ? range
-      : process.env.GSHEET_RANGE
+      let response = await sheetsApi.spreadsheets.values.get({
+        auth: this.client,
+        spreadsheetId: this.spreadsheetId,
+        range: dataRange,
+        valueRenderOption: 'UNFORMATTED_VALUE',
+      })
 
-    let data = sheetsApi.spreadsheets.values.get({
-      auth: this.client,
-      spreadsheetId: this.spreadsheetId,
-      range: dataRange,
-      valueRenderOption: 'UNFORMATTED_VALUE',
-    })
+      this.headerRow = response.data.values[0]
+      let values = response.data.values.slice(1)
 
-    return data
+      return values.map((row, rowNb) => {
+        let obj = {
+          values: row,
+          // update: false,
+          rowNb: rowNb + 2
+        }
+
+        // this.headerRow.forEach((columnName, columnNb) => {
+        //   obj[columnName] = row[columnNb-1]
+        // })
+
+        return obj
+      })
+
+    } catch (e) { console.log(`Error in Model.loadData(): ${e}`) }
   }
 
-  /**
-   * Saves updated rows to Google Sheet
-   */
-  async save(requests) {
-    // update spreadsheet
+  async insertRow(rowArray) {
     try {
-      // await sheetsApi.spreadsheets.values.batchUpdate({
-      //   auth: this.client,
-      //   spreadsheetId: this.spreadsheetId,
-      //   resource: {
-      //     valueInputOption: 'RAW',
-      //     data: requests
-      //   }
-      // })
+      await this.connect()
 
       await sheetsApi.spreadsheets.values.append({
         auth: this.client,
         spreadsheetId: this.spreadsheetId,
-        range: 'gsheetdb!A1:F',
+        range: `${this.sheetName}`,
         insertDataOption: 'INSERT_ROWS',
         valueInputOption: 'RAW',
         resource: {
-          range: 'gsheetdb!A1:F',
+          range: this.sheetName,
           majorDimension: 'ROWS',
-          values: [ ['date', undefined, undefined, 987, 'test'] ]
+          values: [ rowArray ]
         }
       })
       console.log('💾 Data saved.')
 
     } catch (e) { console.log(e) }
   }
+
+  async updateRow(rowNumber, rowArray) {
+    try {
+      await this.connect()
+
+      await sheetsApi.spreadsheets.values.batchUpdate({
+        auth: this.client,
+        spreadsheetId: this.spreadsheetId,
+        resource: {
+          valueInputOption: 'RAW',
+          data: {
+            range: `${this.sheetName}!${rowNumber}:${rowNumber}`,
+            majorDimension: 'ROWS',
+            values: [ rowArray ]
+          }
+        }
+      })
+
+    } catch (e) { console.log(e) }
+  }
+
 }

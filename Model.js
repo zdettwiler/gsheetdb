@@ -1,6 +1,4 @@
-import loki from 'lokijs'
 
-let lokiDB = new loki('test.json')
 
 
 export default class Model {
