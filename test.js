@@ -4,9 +4,9 @@ import GSheetDB from './GSheetDB'
 
 async function testdb() {
 
-  await db.insertRow([12, 34, 567])
+  // await db.insertRow([12, 34, 567])
 
-  await db.updateRow(10, ['', '', 'updated', 'data'])
+  // await db.updateRow(10, ['', '', 'updated', 'data'])
 
   let data = await db.getData()
   console.log(data)
