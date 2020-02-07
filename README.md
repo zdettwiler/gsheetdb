@@ -1,5 +1,5 @@
 # gsheetsdb
-Use Google Sheets as a database.
+Use Google Sheets as a simple database.
 
 ## How to use gsheetsdb
 
@@ -10,7 +10,9 @@ Use Google Sheets as a database.
 
 ## Connecting to the sheet
 ```javascript
-let db = new gsheetdb({
+import GSheetDB from 'gsheetdb'
+
+let db = new GSheetDB({
   sheetId: 'sheetId',
   sheetName: 'sheetName',
   headerRow: true,
@@ -33,11 +35,11 @@ Data returned will look like
 ]
 ```
 
-May be useful to get it in key:value format?
+May be useful to get it in `key: value` format?
 ```javascript
 [
   {
-    date: 'day',
+    date: 'today',
     amount: 123,
     description: 'abc',
     rowNb: 2
