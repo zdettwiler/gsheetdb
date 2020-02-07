@@ -1,6 +1,1 @@
-import sheet from './db'
-
-sheet.connect().then((sheet) => {
-  sheet.updateRow({ greek: 'ἀμην' }, { chapter: 1 })
-  sheet.save()
-})
+module.exports = require('./lib/gsheetdb');
