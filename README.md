@@ -1,8 +1,9 @@
-# gsheetsdb
+# gsheetdb
 Use Google Sheets as a database.
 
-## How to use gsheetsdb
+---
 
+Let's assume this spreadsheet:
 . | A | B | C
 --- | --- | --- | ---
 1 | date | amount | description

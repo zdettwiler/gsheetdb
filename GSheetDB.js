@@ -6,58 +6,27 @@
  *  - make edits;
  *  - don't forget to save changes to update spreadsheet db
  */
-
+import 'dotenv/config'
 import { google } from 'googleapis'
 import { auth } from 'google-auth-library'
-import loki from 'lokijs'
-import credentials from './credentials.json'
 
 const SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 const sheetsApi = google.sheets({ version: 'v4' })
-let db = new loki('test.json')
+
 
 export default class GSheetDB {
 
-  constructor(spreadsheetId, range, nbHeaderRows=1) {
-    this.spreadsheetId = spreadsheetId
-    this.range = this.parseRange(range)
-    this.nbHeaderRows = nbHeaderRows
+  constructor(params) {
+    // TO DO check params
+    console.log(params)
+    this.spreadsheetId = params.sheetId
+    this.headers = params.headers
+    this.headerRow = []
+    this.sheetName = params.sheetName
     this.client = undefined
-    this.data = db.addCollection('data')
+    this.data = []
+    // this.data = lokiDB.addCollection('data')
   }
-
-
-  /**
-   * Parse range into constituents
-   */
-  parseRange(range) {
-    let parse = range.match(/(.+)!([A-Z]+)(\d*):([A-Z]+)(\d*)/)
-
-    return {
-      range: parse[0],
-      sheetName: parse[1],
-      startCol: parse[2],
-      startRow: parse[3] ? parseInt(parse[3]) : 1,
-      endCol: parse[4],
-      endRow: parse[5] ? parseInt(parse[5]) : 1000
-    }
-  }
-
-  /**
-   * Create range string from constituents; is it necessary?
-   */
-  // strRange(sheetName, startCol, startRow, endCol, endRow) {
-  //   let parse = range.match(/(.+)!([A-Z]+)(\d*):([A-Z]+)(\d*)/)
-  //
-  //   return ``{
-  //     range: parse[0],
-  //     sheetName: parse[1],
-  //     startCol: parse[2],
-  //     startRow: parse[3] ? parseInt(parse[3]) : 1,
-  //     endCol: parse[4],
-  //     endRow: parse[5] ? parseInt(parse[5]) : 1000
-  //   }
-  // }
 
   /**
    * Setup database
@@ -65,101 +34,95 @@ export default class GSheetDB {
    *  - load data in Loki
    */
   async connect() {
-    await this.createClient()
-    await this.loadData()
+    if (this.client) return
+    
+    try {
+      // if credentials.json does not exist, use environment var
+      const credentials = process.env.GOOGLE_AUTH_CREDS
+        ? JSON.parse(process.env.GOOGLE_AUTH_CREDS)
+        : require('./credentials.json')
 
-    console.log('🎉 Connection to database successful.')
-    return this
-  }
-
-  /**
-   * Create client
-   */
-  async createClient() {
-    if (!this.client) {
       this.client = auth.fromJSON(credentials);
       this.client.scopes = SCOPES
       await this.client.authorize()
-    }
+      console.log('✨ Created new client.')
+
+    } catch (e) { console.log('error getting client') }
   }
 
   /**
-   * Load data into Loki database
+   * Fetch data from provided range
    */
-  async loadData() {
-    let response = await sheetsApi.spreadsheets.values.get({
-      auth: this.client,
-      spreadsheetId: this.spreadsheetId,
-      range: this.range.range,
-      valueRenderOption: 'UNFORMATTED_VALUE',
-    })
+  async getData(dataRange = this.sheetName) {
+    try {
+      await this.connect()
 
-    // TODO: no assumption!
-    // assumes first row is headers
-    let keys = response.data.values[0]
-    let values = response.data.values.slice(this.nbHeaderRows)
+      let response = await sheetsApi.spreadsheets.values.get({
+        auth: this.client,
+        spreadsheetId: this.spreadsheetId,
+        range: dataRange,
+        valueRenderOption: 'UNFORMATTED_VALUE',
+      })
 
-    let dataObj = values.map((arr, i) => {
-      let obj = {}
-      keys.forEach((key, i) => { obj[key] = arr[i] })
-      obj.update = false
-      obj.row = this.range.startRow + this.nbHeaderRows + i
-      return obj
-    })
+      this.headerRow = response.data.values[0]
+      let values = response.data.values.slice(1)
 
-    this.data.insert(dataObj)
+      return values.map((row, rowNb) => {
+        let obj = {
+          values: row,
+          // update: false,
+          rowNb: rowNb + 2
+        }
+
+        // this.headerRow.forEach((columnName, columnNb) => {
+        //   obj[columnName] = row[columnNb-1]
+        // })
+
+        return obj
+      })
+
+    } catch (e) { console.log(`Error in Model.loadData(): ${e}`) }
   }
 
-  /**
-   * Update a row
-   * @param {Object} findObj - object of format { key: needle }
-   * @param {Object} modifsObj - object { key1: newValue, key2: newValue }
-   */
-  updateRow(findObj, modifsObj) {
-    let wordToUpdate =  this.data.findOne(findObj)
-    wordToUpdate = {
-      ...wordToUpdate,
-      ...modifsObj,
-      update: true
-    }
-    this.data.update(wordToUpdate)
-  }
+  async insertRow(rowArray) {
+    try {
+      await this.connect()
 
-  /**
-   * Saves updated rows to Google Sheet
-   */
-  async save() {
-    let wordsToUpdate = this.data.find({ update: true })
-
-    let requests = wordsToUpdate.map(word => {
-      let values = [
-        word.greek,
-        word.french,
-        word.english,
-        word.chapter,
-        word.known,
-        word.revisionBox,
-        word.lastRevised
-      ]
-
-      return {
-        range: `${this.range.sheetName}!${this.range.startCol}${word.row}:${this.range.endCol}${word.row}`,
-        majorDimension: 'ROWS',
-        values: [ values ]
-      }
-    })
-
-    await sheetsApi.spreadsheets.values.batchUpdate({
-      auth: this.client,
-      spreadsheetId: this.spreadsheetId,
-      resource: {
+      await sheetsApi.spreadsheets.values.append({
+        auth: this.client,
+        spreadsheetId: this.spreadsheetId,
+        range: `${this.sheetName}`,
+        insertDataOption: 'INSERT_ROWS',
         valueInputOption: 'RAW',
-        data: requests
-      }
-    })
+        resource: {
+          range: this.sheetName,
+          majorDimension: 'ROWS',
+          values: [ rowArray ]
+        }
+      })
+      console.log('💾 Data saved.')
 
-    console.log('💾 Data saved.')
+    } catch (e) { console.log(e) }
   }
 
+  async updateRow(rowNumber, rowArray) {
+    try {
+      await this.connect()
+
+      await sheetsApi.spreadsheets.values.batchUpdate({
+        auth: this.client,
+        spreadsheetId: this.spreadsheetId,
+        resource: {
+          valueInputOption: 'RAW',
+          data: {
+            range: `${this.sheetName}!${rowNumber}:${rowNumber}`,
+            majorDimension: 'ROWS',
+            values: [ rowArray ]
+          }
+        }
+      })
+
+    } catch (e) { console.log(e) }
+  }
 
 }
