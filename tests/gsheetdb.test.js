@@ -152,3 +152,62 @@ describe('getData', () => {
     await expect(db.getData()).rejects.toThrowError('Error in GSheetDB.getData:\nError: error')
   })
 })
+
+describe('insertRows', () => {
+  let mockConnect
+  let mockAppend
+  
+  beforeEach(() => {
+    mockAppend = jest.fn().mockImplementation(() => Promise.resolve())
+    google.sheets.mockClear().mockReturnValue({ spreadsheets: {
+      values: { append: mockAppend }
+    }})
+
+    mockConnect = jest.fn().mockImplementation(() => Promise.resolve())
+    db.connect = mockConnect
+  })
+
+  it('defines a insertRows method', () => {
+    expect(db.insertRows).toBeInstanceOf(Function)
+  })
+
+  it('throws if rows is not provided', async () => {
+    await expect(db.insertRows()).rejects.toThrowError('No rows provided!')
+  })
+
+  it('throws if rows is not an array', async () => {
+    await expect(db.insertRows('row')).rejects.toThrowError('No rows provided!')
+  })
+
+  it('throws if rows is an empty array', async () => {
+    await expect(db.insertRows([])).rejects.toThrowError('No rows provided!')
+  })
+
+  it('calls connect', async () => {
+    await db.insertRows([['data']])
+    expect(mockConnect).toHaveBeenCalled()
+  })
+
+  it('calls sheetsApi.spreadsheets.values.append', async () => {
+    db.client = { client: 'stuff' }
+    await db.insertRows([['a', 'b', 'c']])
+    expect(mockAppend).toHaveBeenCalledWith({
+      auth: { client: 'stuff' },
+      spreadsheetId: 'spreadsheetId',
+      range: 'sheetName',
+      insertDataOption: 'INSERT_ROWS',
+      valueInputOption: 'RAW',
+      resource: {
+        range: 'sheetName',
+        majorDimension: 'ROWS',
+        values: [['a', 'b', 'c']]
+      }
+    })
+  })
+
+  it('throws if error', async () => {
+    mockConnect = jest.fn().mockImplementation(() => { throw new Error('error') })
+    db.connect = mockConnect
+    await expect(db.insertRows([['data']])).rejects.toThrowError('Error in GSheetDB.insertRows:\nError: error')
+  })
+})

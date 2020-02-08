@@ -55,4 +55,32 @@ export default class GSheetDB {
     } catch (e) { throw new Error(`Error in GSheetDB.getData:\n${e}`) }
 
   }
+
+  /**
+   * 
+   * @param {Array} rows Array of rows (as arrays) [ [row1], [row2], etc. ]
+   */
+  async insertRows(rows) {
+    if (!rows || !Array.isArray(rows) || !rows.length) {
+      throw new Error(`No rows provided!`)
+    }
+
+    try {
+      await this.connect()
+
+      await google.sheets({ version: 'v4' }).spreadsheets.values.append({
+        auth: this.client,
+        spreadsheetId: this.spreadsheetId,
+        range: `${this.sheetName}`,
+        insertDataOption: 'INSERT_ROWS',
+        valueInputOption: 'RAW',
+        resource: {
+          range: this.sheetName,
+          majorDimension: 'ROWS',
+          values: rows
+        }
+      })
+
+    } catch (e) { throw new Error(`Error in GSheetDB.insertRows:\n${e}`) }
+  }
 }

@@ -3,7 +3,13 @@ Use Google Sheets as a database.
 
 ---
 
+## Preparing the spreadsheet
+_getting credentials, etc._
+
+---
+
 Let's assume this spreadsheet:
+
 . | A | B | C
 --- | --- | --- | ---
 1 | date | amount | description
@@ -16,7 +22,7 @@ import GSheetDB from 'gsheetdb'
 let db = new GSheetDB({
   sheetId: 'sheetId',
   sheetName: 'sheetName',
-  headerRow: true,
+  credentials: {} // replace with JSON formatted credentials
 })
 ```
 
@@ -48,23 +54,26 @@ May be useful to get it in `key: value` format?
 ]
 ```
 
-## Insert a row
-Now if we add a row
+## Insert rows
+Now if we add rows
 ```javascript
-await db.insertRow(
-  ['tomorrow', 456, 'def']
-)
+await db.insertRows([
+  ['tomorrow', 456, 'def'],
+  ['monday', 23, 'ghi']
+])
 ```
 
 And table will look like this
 
 . | A | B | C
---- | --- | --- | ---
+--- | --- | ---: | ---
 1 | date | amount | description
 2 | today | 123 | abc
 3 | tomorrow | 456 | def
+4 | monday | 23 | ghi
 
-## Update a row
+## _TO DO_ Update a row
+
 To update a row
 ```javascript
 await db.updateRow(3,
@@ -77,3 +86,4 @@ await db.updateRow(3,
 1 | date | amount | description
 2 | today | 123 | abc
 3 | yesterday | 456 | def
+4 | monday | 23 | ghi
