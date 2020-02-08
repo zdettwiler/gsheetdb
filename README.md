@@ -12,7 +12,7 @@ Let's assume this spreadsheet:
 
 . | A | B | C
 --- | --- | --- | ---
-1 | date | amount | description
+1 | **date** | **amount** | **description**
 2 | today | 123 | abc
 
 ## Connecting to the sheet
@@ -67,7 +67,7 @@ And table will look like this
 
 . | A | B | C
 --- | --- | ---: | ---
-1 | date | amount | description
+1 | **date** | **amount** | **description**
 2 | today | 123 | abc
 3 | tomorrow | 456 | def
 4 | monday | 23 | ghi
@@ -83,7 +83,7 @@ await db.updateRow(3,
 
 . | A | B | C
 --- | --- | --- | ---
-1 | date | amount | description
+1 | **date** | **amount** | **description**
 2 | today | 123 | abc
 3 | yesterday | 456 | def
 4 | monday | 23 | ghi
