@@ -15,6 +15,9 @@ Let's assume this spreadsheet:
 1 | **date** | **amount** | **description**
 2 | today | 123 | abc
 
+The first row will always be considered as headers.
+
+
 ## Connecting to the sheet
 ```javascript
 import GSheetDB from 'gsheetdb'
@@ -66,18 +69,17 @@ await db.insertRows([
 And table will look like this
 
 . | A | B | C
---- | --- | ---: | ---
+--- | --- | --- | ---
 1 | **date** | **amount** | **description**
 2 | today | 123 | abc
 3 | tomorrow | 456 | def
 4 | monday | 23 | ghi
 
-## _TO DO_ Update a row
-
-To update a row
+## Update a row
+To update a row:
 ```javascript
-await db.updateRow(3,
-  ['yesterday', 456, 'def']
+await db.updateRow(
+  3, ['yesterday', 456, 'def']
 )
 ```
 
@@ -87,3 +89,6 @@ await db.updateRow(3,
 2 | today | 123 | abc
 3 | yesterday | 456 | def
 4 | monday | 23 | ghi
+
+
+Would it be useful to be able to update several rows at a time?

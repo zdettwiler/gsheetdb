@@ -211,3 +211,59 @@ describe('insertRows', () => {
     await expect(db.insertRows([['data']])).rejects.toThrowError('Error in GSheetDB.insertRows:\nError: error')
   })
 })
+
+describe('updateRow', () => {
+  let mockConnect
+  let mockBatchUpdate
+  
+  beforeEach(() => {
+    mockBatchUpdate = jest.fn().mockImplementation(() => Promise.resolve())
+    google.sheets.mockClear().mockReturnValue({ spreadsheets: {
+      values: { batchUpdate: mockBatchUpdate }
+    }})
+
+    mockConnect = jest.fn().mockImplementation(() => Promise.resolve())
+    db.connect = mockConnect
+  })
+
+  it('defines a updateRow method', () => {
+    expect(db.updateRow).toBeInstanceOf(Function)
+  })
+
+  it('calls connect', async () => {
+    await db.updateRow(1, ['a', 'b', 'c'])
+    expect(mockConnect).toHaveBeenCalled()
+  })
+
+  it('calls sheetsApi.spreadsheets.values.batchUpdate', async () => {
+    db.client = { client: 'stuff' }
+    await db.updateRow(3, ['a', 'b', 'c'])
+
+    expect(mockBatchUpdate).toHaveBeenCalledWith({
+      auth: { client: 'stuff' },
+      spreadsheetId: 'spreadsheetId',
+      resource: {
+        valueInputOption: 'RAW',
+        data: {
+          range: 'sheetName!3:3',
+          majorDimension: 'ROWS',
+          values: [ ['a', 'b', 'c'] ]
+        }
+      }
+    })
+  })
+
+  it('throws if no row number is provided', async () => {
+    await expect(db.updateRow()).rejects.toThrowError('Error in GSheetDB.updateRow:\nNo row number provided!')
+  })
+
+  it('throws if no new row is provided', async () => {
+    await expect(db.updateRow(2)).rejects.toThrowError('Error in GSheetDB.updateRow:\nNo new row provided!')
+  })
+
+  it('throws if connection error', async () => {
+    mockConnect = jest.fn().mockImplementation(() => { throw new Error('error') })
+    db.connect = mockConnect
+    await expect(db.updateRow(1, ['data'])).rejects.toThrowError('Error in GSheetDB.updateRow:\nError: error')
+  })
+})

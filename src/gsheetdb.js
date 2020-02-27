@@ -57,15 +57,15 @@ export default class GSheetDB {
   }
 
   /**
-   * 
+   * Insert new rows
    * @param {Array} rows Array of rows (as arrays) [ [row1], [row2], etc. ]
    */
   async insertRows(rows) {
-    if (!rows || !Array.isArray(rows) || !rows.length) {
-      throw new Error(`No rows provided!`)
-    }
-
     try {
+      if (!rows || !Array.isArray(rows) || !rows.length) {
+        throw 'No rows provided!'
+      }
+
       await this.connect()
 
       await google.sheets({ version: 'v4' }).spreadsheets.values.append({
@@ -82,5 +82,38 @@ export default class GSheetDB {
       })
 
     } catch (e) { throw new Error(`Error in GSheetDB.insertRows:\n${e}`) }
+  }
+
+  /**
+   * Update a row identified by its number with new data
+   * @param {Integer} rowNumber Row number
+   * @param {Array} rowArray New row data
+   */
+  async updateRow(rowNumber, rowArray) {
+    try {
+      if (!rowNumber) {
+        throw 'No row number provided!'
+      }
+      
+      if (!rowArray || !Array.isArray(rowArray) || !rowArray.length) {
+        throw 'No new row provided!'
+      }
+  
+      await this.connect()
+
+      await google.sheets({ version: 'v4' }).spreadsheets.values.batchUpdate({
+        auth: this.client,
+        spreadsheetId: this.spreadsheetId,
+        resource: {
+          valueInputOption: 'RAW',
+          data: {
+            range: `${this.sheetName}!${rowNumber}:${rowNumber}`,
+            majorDimension: 'ROWS',
+            values: [ rowArray ]
+          }
+        }
+      })
+
+    } catch (e) { throw new Error(`Error in GSheetDB.updateRow:\n${e}`) }
   }
 }
