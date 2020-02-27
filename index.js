@@ -1,1 +1,1 @@
-module.exports = require('./lib/gsheetdb')
+module.exports = require('./lib/gsheetdb').default

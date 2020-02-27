@@ -1,1 +1,3 @@
 src/
+.env
+example.js

@@ -5,6 +5,19 @@ const SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 
 export default class gsheetdb {
   constructor(parameters) {
+    if (!parameters) {
+      throw 'You need to provide identification!'
+    }
+    if (!parameters.spreadsheetId) {
+      throw 'You need to provide spreadsheetId!'
+    }
+    if (!parameters.sheetName) {
+      throw 'You need to provide sheetName!'
+    }
+    if (!parameters.credentialsJSON) {
+      throw 'You need to provide credentialsJSON!'
+    }
+
     this.spreadsheetId = parameters.spreadsheetId
     this.sheetName = parameters.sheetName
     this.credentialsJSON = parameters.credentialsJSON

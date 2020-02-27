@@ -20,14 +20,15 @@ The first row will always be considered as headers.
 
 ## Connecting to the sheet
 ```javascript
-import GSheetDB from 'gsheetdb'
+import gsheetdb from 'gsheetdb'
 
-let db = new GSheetDB({
-  sheetId: 'sheetId',
-  sheetName: 'sheetName',
-  credentials: {} // replace with JSON formatted credentials
+let db = new gsheetdb({
+  spreadsheetId: 'sheetId', // replace with spreadsheet id
+  sheetName: 'sheetName',   // replace with sheet name
+  credentialsJSON: {}       // replace with JSON formatted credentials
 })
 ```
+
 
 ## Getting the data
 So let's begin to read some data:
@@ -57,6 +58,7 @@ May be useful to get it in `key: value` format?
 ]
 ```
 
+
 ## Insert rows
 Now if we add rows
 ```javascript
@@ -74,6 +76,7 @@ And table will look like this
 2 | today | 123 | abc
 3 | tomorrow | 456 | def
 4 | monday | 23 | ghi
+
 
 ## Update a row
 To update a row:

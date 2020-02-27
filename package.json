@@ -1,13 +1,13 @@
 {
   "name": "gsheetdb",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Use Google Sheets as a simple database.",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon --exec babel test.js",
+    "start": "nodemon --exec sh -ac 'source .env && babel-node ./example.js'",
     "test": "jest --watch",
     "compile": "babel src --out-dir lib",
-    "publish": "npm run compile && npm publish"
+    "prepublish": "npm run compile"
   },
   "keywords": [
     "google",
@@ -24,7 +24,7 @@
   "bugs": {
     "url": "https://github.com/zdettwiler/gsheetsdb/issues"
   },
-  "homepage": "https://github.com/zdettwiler/gsheetsdb#readme",
+  "homepage": "https://github.com/zdettwiler/gsheetsdb",
   "dependencies": {
     "google-auth-library": "^4.2.6",
     "googleapis": "^39.2.0"
