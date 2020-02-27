@@ -1,7 +1,7 @@
 {
-  "name": "gsheetsdb",
+  "name": "gsheetdb",
   "version": "1.0.0",
-  "description": "Use Google Sheets as a database.",
+  "description": "Use Google Sheets as a simple database.",
   "main": "lib/index.js",
   "scripts": {
     "start": "nodemon --exec babel test.js",

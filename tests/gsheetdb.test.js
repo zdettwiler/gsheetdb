@@ -1,4 +1,4 @@
-import GSheetDB from '../src/gsheetdb'
+import gsheetdb from '../src/gsheetdb'
 
 jest.mock('google-auth-library')
 import { auth } from 'google-auth-library'
@@ -10,7 +10,7 @@ import { google } from 'googleapis'
 let db
 
 beforeEach(() => {
-  db = new GSheetDB({
+  db = new gsheetdb({
     spreadsheetId: 'spreadsheetId',
     sheetName: 'sheetName',
     credentialsJSON: 'credentialsJSON'
@@ -19,7 +19,7 @@ beforeEach(() => {
 
 describe('constructor', () => {
   it('returns a class', () => {
-    expect(db).toBeInstanceOf(GSheetDB)
+    expect(db).toBeInstanceOf(gsheetdb)
   })
   
   it('sets sheetId', () => {
@@ -244,11 +244,11 @@ describe('updateRow', () => {
       spreadsheetId: 'spreadsheetId',
       resource: {
         valueInputOption: 'RAW',
-        data: {
+        data: [{
           range: 'sheetName!3:3',
           majorDimension: 'ROWS',
           values: [ ['a', 'b', 'c'] ]
-        }
+        }]
       }
     })
   })

@@ -3,7 +3,7 @@ import { auth } from 'google-auth-library'
 
 const SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 
-export default class GSheetDB {
+export default class gsheetdb {
   constructor(parameters) {
     this.spreadsheetId = parameters.spreadsheetId
     this.sheetName = parameters.sheetName
@@ -106,11 +106,11 @@ export default class GSheetDB {
         spreadsheetId: this.spreadsheetId,
         resource: {
           valueInputOption: 'RAW',
-          data: {
+          data: [{
             range: `${this.sheetName}!${rowNumber}:${rowNumber}`,
             majorDimension: 'ROWS',
             values: [ rowArray ]
-          }
+          }]
         }
       })
 
