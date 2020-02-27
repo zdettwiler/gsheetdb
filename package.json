@@ -2,12 +2,19 @@
   "name": "gsheetdb",
   "version": "1.0.0",
   "description": "Use Google Sheets as a simple database.",
-  "main": "lib/index.js",
+  "main": "index.js",
   "scripts": {
     "start": "nodemon --exec babel test.js",
     "test": "jest --watch",
-    "compile": "babel src --out-dir lib"
+    "compile": "babel src --out-dir lib",
+    "publish": "npm run compile && npm publish"
   },
+  "keywords": [
+    "google",
+    "sheets",
+    "spreadsheet",
+    "database"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/zdettwiler/gsheetsdb.git"
