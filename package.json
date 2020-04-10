@@ -3,6 +3,7 @@
   "version": "1.0.1",
   "description": "Use Google Sheets as a simple database.",
   "main": "index.js",
+  "types": "typings/index.d.ts",
   "scripts": {
     "start": "nodemon --exec sh -ac 'source .env && babel-node ./example.js'",
     "test": "jest --watch",
