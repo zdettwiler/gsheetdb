@@ -1,6 +1,6 @@
 {
   "name": "gsheetdb",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Use Google Sheets as a simple database.",
   "main": "index.js",
   "scripts": {
