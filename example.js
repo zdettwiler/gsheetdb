@@ -9,3 +9,7 @@ let db = new gsheetdb({
 })
 
 db.getData().then(data => console.log(data))
+db.insertRows([
+  ['tomorrow', 456, 'def'],
+  ['monday', 23, 'ghi']
+]);
